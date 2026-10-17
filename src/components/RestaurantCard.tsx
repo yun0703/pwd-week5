@@ -12,7 +12,6 @@ interface RestaurantCardProps {
   restaurant: Restaurant;
 }
 
-// Styled Components는 그대로 유지
 const Card = styled.div`
   background: white;
   border-radius: 12px;
@@ -73,7 +72,6 @@ const ActionRow = styled.div`
   border-top: 1px solid #eee;
 `;
 
-// $liked로 변경 (transient prop)
 const LikeButton = styled.button<{ $liked: boolean }>`
   display: flex;
   align-items: center;
@@ -103,20 +101,16 @@ const DetailLink = styled(Link)`
 `;
 
 function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  // State 초기화
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(restaurant.likes || 0);
 
-  // 컴포넌트 마운트 시 LocalStorage에서 데이터 복원
   useEffect(() => {
-    // 1. 좋아요 여부 복원
     try {
       const likedRestaurants = readStoredValue('likedRestaurants', isLikedRestaurants, []);
       if (likedRestaurants.includes(restaurant.id)) {
         setLiked(true);
       }
 
-      // 2. 좋아요 수 복원
       const savedLikes = readStoredValue('restaurantLikes', isRestaurantLikes, {});
       const savedCount = savedLikes[restaurant.id];
       if (savedCount !== undefined) {
@@ -128,29 +122,24 @@ function RestaurantCard({ restaurant }: RestaurantCardProps) {
   }, [restaurant.id, restaurant.likes]);
 
   const handleLike = (e: MouseEvent<HTMLButtonElement>) => {
-    // 이벤트 전파 방지 (중요!)
     e.preventDefault();
     e.stopPropagation();
 
     try {
-      // 새로운 상태 계산
       const newLikedState = !liked;
       const newLikesCount = newLikedState 
         ? likes + 1 
-        : Math.max(0, likes - 1); // 음수 방지
+        : Math.max(0, likes - 1);
 
-      // 두 저장값을 먼저 읽고 검증합니다.
       const previousLikedRestaurants = localStorage.getItem('likedRestaurants');
       const likedRestaurants = readStoredValue('likedRestaurants', isLikedRestaurants, []);
       const restaurantLikes = readStoredValue('restaurantLikes', isRestaurantLikes, {});
       
       if (newLikedState) {
-        // 좋아요 추가
         if (!likedRestaurants.includes(restaurant.id)) {
           likedRestaurants.push(restaurant.id);
         }
       } else {
-        // 좋아요 취소
         const index = likedRestaurants.indexOf(restaurant.id);
         if (index > -1) {
           likedRestaurants.splice(index, 1);
@@ -162,7 +151,6 @@ function RestaurantCard({ restaurant }: RestaurantCardProps) {
       try {
         localStorage.setItem('restaurantLikes', JSON.stringify(restaurantLikes));
       } catch (error) {
-        // 두 번째 저장이 실패하면 먼저 저장한 좋아요 여부를 복원합니다.
         if (previousLikedRestaurants === null) {
           localStorage.removeItem('likedRestaurants');
         } else {
@@ -171,7 +159,6 @@ function RestaurantCard({ restaurant }: RestaurantCardProps) {
         throw error;
       }
 
-      // 저장이 완료된 뒤에만 화면과 성공 알림을 갱신합니다.
       setLiked(newLikedState);
       setLikes(newLikesCount);
       if (newLikedState) {
@@ -180,7 +167,6 @@ function RestaurantCard({ restaurant }: RestaurantCardProps) {
         toast.info('좋아요를 취소했습니다.');
       }
 
-      // 디버깅용 로그
       console.log('좋아요 업데이트:', {
         restaurantId: restaurant.id,
         liked: newLikedState,
@@ -221,9 +207,9 @@ function RestaurantCard({ restaurant }: RestaurantCardProps) {
         
         <ActionRow>
           <LikeButton 
-            $liked={liked}  // $ prefix 추가
+            $liked={liked}  
             onClick={handleLike}
-            type="button"  // 명시적 type 지정
+            type="button"  
           >
             <FaHeart /> {likes}
           </LikeButton>
