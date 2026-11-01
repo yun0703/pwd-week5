@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { FaHome, FaList, FaFire, FaPlus } from 'react-icons/fa';
+import { FaHome, FaList, FaFire, FaPlus, FaTools } from 'react-icons/fa';
 
 const HeaderContainer = styled.header`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -58,6 +58,9 @@ function Header() {
         </NavLink>
         <NavLink to="/submit" className={isActive('/submit')}>
           <FaPlus /> Submit New restaurant
+        </NavLink>
+        <NavLink to="/admin" className={isActive('/admin')}>
+          <FaTools /> Admin
         </NavLink>
       </Nav>
     </HeaderContainer>
